@@ -63,16 +63,23 @@
         function check() {
             const password = document.getElementById('passInput').value;
             const mensagem = document.getElementById('mensagem');
-    
+            
+            if (password == "Grupo_Z") {
+                mensagem.innerHTML = "Pode entrar, cara.";
+                mensagem.style.color = "#40ff00";
+                setTimeout(() => {
+                    window.location = "grupo.html";
+                }, 500);
+            }
             if (password == "Missao_D") {
                 mensagem.innerHTML = "Pode entrar, cara.";
                 mensagem.style.color = "#40ff00";
                 setTimeout(() => {
                     window.location = "missao.html";
-                }, 1500);
+                }, 500);
             } else {
-                mensagem.innerHTML = "Saia daqui";
-                mensagem.style.color = "#ff0000";
+                mensagem.innerHTML = "...";
+                mensagem.style.color = "#40ff00";
             }
         }
         
