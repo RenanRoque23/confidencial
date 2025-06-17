@@ -2,19 +2,20 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Chat Coletivo</title>
+  <title>Chat Coletivo Hacker</title>
+  <link rel="icon" href="logo.png">
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Courier New', monospace;
       margin: 0;
       background: #000000;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      -webkit-text-fill-color: #44ff00;
+      color: #44ff00;
     }
 
     #chat-container {
@@ -31,10 +32,31 @@
     }
 
     .msg {
-      margin: 8px 0;
-      padding: 8px;
+      margin: 12px 0;
+      padding: 12px;
       border-radius: 4px;
-      background: #000000;
+      background: #0a0a0a;
+      border-left: 3px solid #44ff00;
+      position: relative;
+      overflow: hidden;
+      animation: typing 0.3s ease-out;
+    }
+
+    .msg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        to right,
+        rgba(68, 255, 0, 0.1) 0%,
+        rgba(68, 255, 0, 0) 10%,
+        rgba(68, 255, 0, 0) 90%,
+        rgba(68, 255, 0, 0.1) 100%
+      );
+      pointer-events: none;
     }
 
     .msg img {
@@ -42,7 +64,34 @@
       height: 30px;
       border-radius: 50%;
       vertical-align: middle;
-      margin-right: 5px;
+      margin-right: 8px;
+      border: 1px solid #44ff00;
+      box-shadow: 0 0 5px rgba(68, 255, 0, 0.5);
+    }
+
+    .msg strong {
+      color: #44ff00;
+      text-shadow: 0 0 5px rgba(68, 255, 0, 0.5);
+    }
+
+    .msg.admin {
+      border-left-color: #ff5555;
+      background: #110000;
+    }
+
+    .msg.admin strong {
+      color: #ff5555;
+      text-shadow: 0 0 5px rgba(255, 85, 85, 0.5);
+    }
+
+    .msg.admin::before {
+      background: linear-gradient(
+        to right,
+        rgba(255, 85, 85, 0.1) 0%,
+        rgba(255, 85, 85, 0) 10%,
+        rgba(255, 85, 85, 0) 90%,
+        rgba(255, 85, 85, 0.1) 100%
+      );
     }
 
     #input-area {
@@ -50,26 +99,53 @@
       padding: 10px;
       background-color: #000000;
       gap: 8px;
-      color: green;
+      border-top: 1px solid #44ff00;
     }
 
     #message {
       flex: 1;
-      padding: 8px;
-      border-radius: 5px;
+      padding: 10px;
+      border-radius: 4px;
       border: 1px solid #44ff00;
       font-size: 14px;
+      background: #0a0a0a;
+      color: #44ff00;
+      font-family: 'Courier New', monospace;
     }
 
-    #send-btn {
-      padding: 8px 12px;
-      background: rgb(0, 0, 0);
-      color: rgb(43, 255, 0);
-      border:#44ff00;
-      border-left-color: #44ff00;
-      border-radius: 5px;
+    #send-btn, #reset-btn {
+      padding: 10px 15px;
+      background: #0a0a0a;
+      color: #44ff00;
+      border: 1px solid #44ff00;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 14px;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    #send-btn:hover, #reset-btn:hover {
+      background: #44ff00;
+      color: #000;
+      text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    #reset-btn {
+      background: #110000;
+      border-color: #ff5555;
+      color: #ff5555;
+      display: none; /* Escondido por padrão */
+    }
+
+    #reset-btn:hover {
+      background: #ff5555;
+      color: #000;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     #auth-area {
@@ -78,71 +154,88 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      background: #000;
     }
 
     .form {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding: 20px;
-      background: #526d50;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
+      gap: 12px;
+      padding: 25px;
+      background: #0a0a0a;
+      border-radius: 5px;
+      border: 1px solid #44ff00;
+      width: 320px;
+      box-shadow: 0 0 15px rgba(68, 255, 0, 0.3);
+    }
+
+    .form h2 {
+      text-align: center;
+      margin: 0 0 15px 0;
+      color: #44ff00;
+      text-shadow: 0 0 5px rgba(68, 255, 0, 0.5);
     }
 
     input {
       padding: 10px;
       width: 100%;
       box-sizing: border-box;
-      border: 1px solid #ddd;
+      border: 1px solid #44ff00;
       border-radius: 4px;
-    }
-    
-    input:invalid {
-      border-color: #ff4444;
-    }
-
-    input:focus:invalid {
-      box-shadow: 0 0 5px rgba(255, 68, 68, 0.5);
-    }
-    
-    button {
-      padding: 10px;
-      width: 100px;
-      box-sizing: border-box;
-      position: relative;
-      border: none;
-      border-radius: 4px;
-      background: #4285f4;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
+      background: #000;
+      color: #44ff00;
+      font-family: 'Courier New', monospace;
     }
 
-    button:hover {
-      background: #3367d6;
+    input::placeholder {
+      color: #2a8c00;
     }
 
-    button:disabled {
-      background: #cccccc;
-      cursor: not-allowed;
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 5px rgba(68, 255, 0, 0.5);
+    }
+
+    #auth-button {
+      padding: 12px;
+      width: 100%;
+      background: #0a0a0a;
+      color: #44ff00;
+      border: 1px solid #44ff00;
+      margin-top: 10px;
+    }
+
+    #auth-button:hover {
+      background: #44ff00;
+      color: #000;
     }
 
     .error {
-      color: #d32f2f;
+      color: #ff5555;
       text-align: center;
       font-size: 14px;
       min-height: 18px;
       margin-top: 5px;
+      text-shadow: 0 0 3px rgba(255, 85, 85, 0.5);
+    }
+
+    .timestamp {
+      font-size: 0.7em;
+      color: #2a8c00;
+      margin-left: 8px;
     }
 
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
 
+    @keyframes typing {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .loading {
+      position: relative;
       padding-left: 30px;
     }
 
@@ -154,16 +247,17 @@
       width: 16px;
       height: 16px;
       margin-top: -8px;
-      border: 2px solid #fff;
+      border: 2px solid #44ff00;
       border-top-color: transparent;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
 
-    .timestamp {
-      font-size: 0.8em;
-      color: #666;
-      margin-left: 5px;
+    #admin-controls {
+      padding: 10px;
+      background: #110000;
+      border-bottom: 1px solid #ff5555;
+      display: none;
     }
   </style>
 </head>
@@ -171,266 +265,287 @@
   <!-- Login / Cadastro Unificado -->
   <div id="auth-area">
     <div id="form-unificado" class="form">
-      <h2 style="text-align: center; margin-bottom: 20px;">Entrar ou Criar Conta</h2>
+      <h2>Terminal de Acesso</h2>
       <input type="text" id="auth-username" placeholder="Nome de usuário" required />
       <input type="email" id="auth-email" placeholder="Email" required />
       <input type="password" id="auth-password" placeholder="Senha (mínimo 6 caracteres)" required minlength="6" />
       <input type="text" id="auth-photo" placeholder="URL da foto (opcional)" />
-      <button onclick="autenticarUsuario()" id="auth-button">Entrar/Criar Conta</button>
+      <button id="auth-button" onclick="autenticarUsuario()">INICIAR SESSÃO</button>
       <div id="auth-error" class="error"></div>
     </div>
   </div>
 
   <!-- Chat -->
   <div id="chat-container">
+    <div id="admin-controls">
+      <button id="reset-btn" onclick="resetChat()">ZERAR CHAT</button>
+    </div>
     <div id="chat-box"></div>
     <div id="input-area">
       <input type="text" id="message" autocomplete="off" placeholder="Digite sua mensagem..." />
-      <button id="send-btn" onclick="sendMessage()">Enviar</button>
-      <!--<button id="reset-btn" onclick="resetChat()">Resetar Chat</button>-->
+      <button id="send-btn" onclick="sendMessage()">ENVIAR</button>
     </div>
   </div>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA45V1NRrnIX_i9S7NmmRpKrXnqph3cr_0",
-      authDomain: "grupo-299e8.firebaseapp.com",
-      projectId: "grupo-299e8",
-      storageBucket: "grupo-299e8.appspot.com",
-      messagingSenderId: "1042794465054",
-      appId: "1:1042794465054:web:f6e07a92be85c7baf0eb0f"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyA45V1NRrnIX_i9S7NmmRpKrXnqph3cr_0",
+  authDomain: "grupo-299e8.firebaseapp.com",
+  projectId: "grupo-299e8",
+  storageBucket: "grupo-299e8.appspot.com",
+  messagingSenderId: "1042794465054",
+  appId: "1:1042794465054:web:f6e07a92be85c7baf0eb0f"
+};
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    let currentUser = null;
+// Inicializa o Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-    async function autenticarUsuario() {
-      const nome = document.getElementById("auth-username").value.trim();
-      const email = document.getElementById("auth-email").value.trim();
-      const senha = document.getElementById("auth-password").value;
-      const foto = document.getElementById("auth-photo").value.trim();
-      const errorElement = document.getElementById("auth-error");
-      const btnAuth = document.getElementById("auth-button");
+// Variáveis de estado
+let currentUser = null;
+let isAdmin = false;
+let chatListener = null;
 
-      // Limpa erros anteriores
-      errorElement.textContent = "";
-      
-      // Validação básica
-      if (!nome || !email || !senha) {
-        errorElement.textContent = "Preencha todos os campos obrigatórios!";
-        return;
-      }
+// Função de autenticação melhorada
+async function autenticarUsuario() {
+  const nome = document.getElementById("auth-username").value.trim();
+  const email = document.getElementById("auth-email").value.trim().toLowerCase();
+  const senha = document.getElementById("auth-password").value;
+  const foto = document.getElementById("auth-photo").value.trim();
+  const errorElement = document.getElementById("auth-error");
+  const btnAuth = document.getElementById("auth-button");
 
-      // Validação de email
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errorElement.textContent = "Por favor, insira um email válido!";
-        return;
-      }
+  // Reset de estado
+  errorElement.textContent = "";
+  btnAuth.disabled = true;
+  btnAuth.classList.add("loading");
+  const btnOriginalText = btnAuth.textContent;
+  btnAuth.textContent = "Processando...";
 
-      // Salva estado original do botão
-      const btnOriginalText = btnAuth.textContent;
-      btnAuth.textContent = "Carregando...";
-      btnAuth.classList.add("loading");
-      btnAuth.disabled = true;
+  try {
+    // Validações básicas
+    if (!nome || !email || !senha) {
+      throw new Error("Preencha todos os campos obrigatórios!");
+    }
 
-      try {
-        // Tenta login primeiro
-        const userCredential = await auth.signInWithEmailAndPassword(email, senha);
-        
-        // Garante que o usuário tenha um displayName
-        if (!userCredential.user.displayName) {
-          await userCredential.user.updateProfile({
-            displayName: nome,
-            photoURL: foto || "https://i.imgur.com/2WZtOD5.png"
-          });
-          // Recarrega o usuário para pegar as atualizações
-          await userCredential.user.reload();
-        }
-        
-      } catch (err) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new Error("Por favor, insira um email válido!");
+    }
+
+    // Tenta login
+    try {
+      const userCredential = await auth.signInWithEmailAndPassword(email, senha);
+      await processarUsuario(userCredential.user, nome, foto);
+    } catch (loginError) {
+      if (loginError.code === "auth/user-not-found") {
         // Se usuário não existe, tenta cadastrar
-        if (err.code === "auth/user-not-found") {
-          try {
-            if (senha.length < 6) {
-              throw new Error("A senha precisa ter 6 ou mais caracteres.");
-            }
-
-            // Verifica se nome de usuário já existe
-            const query = await db.collection("usuarios").where("username", "==", nome).get();
-            if (!query.empty) {
-              throw new Error("Esse nome de usuário já existe.");
-            }
-
-            // Cria novo usuário
-            const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
-            await userCredential.user.updateProfile({
-              displayName: nome,
-              photoURL: foto || "https://i.imgur.com/2WZtOD5.png"
-            });
-            await db.collection("usuarios").doc(userCredential.user.uid).set({ 
-              username: nome,
-              email: email,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-
-            // Recarrega o usuário para pegar as atualizações
-            await userCredential.user.reload();
-
-          } catch (cadastroError) {
-            errorElement.textContent = cadastroError.message;
-            btnAuth.textContent = btnOriginalText;
-            btnAuth.classList.remove("loading");
-            btnAuth.disabled = false;
-            return;
-          }
-        } else if (err.code === "auth/wrong-password") {
-          errorElement.textContent = "Senha incorreta!";
-        } else {
-          errorElement.textContent = "Erro: " + err.message;
-        }
-        
-        btnAuth.textContent = btnOriginalText;
-        btnAuth.classList.remove("loading");
-        btnAuth.disabled = false;
-        return;
-      }
-
-      // Restaura botão se tudo der certo
-      btnAuth.textContent = btnOriginalText;
-      btnAuth.classList.remove("loading");
-      btnAuth.disabled = false;
-    }
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // Garante que o usuário tenha displayName
-        if (!user.displayName) {
-          // Se não tiver, usa o email como fallback
-          user.displayName = user.email.split('@')[0];
-        }
-        
-        currentUser = user;
-        document.getElementById("auth-area").style.display = "none";
-        document.getElementById("chat-container").style.display = "flex";
-        startChat();
+        await cadastrarUsuario(nome, email, senha, foto);
       } else {
-        currentUser = null;
-        document.getElementById("auth-area").style.display = "flex";
-        document.getElementById("chat-container").style.display = "none";
+        throw loginError;
       }
-    });
-
-    function startChat() {
-      db.collection("mensagens")
-        .orderBy("timestamp")
-        .onSnapshot(snapshot => {
-          const chat = document.getElementById("chat-box");
-          chat.innerHTML = "";
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const date = data.timestamp?.toDate() || new Date();
-            const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            chat.innerHTML += `
-              <div class="msg">
-                <img src="${data.photo || 'https://i.imgur.com/2WZtOD5.png'}" />
-                <strong>${data.nome}</strong>
-                <span class="timestamp">${timeString}</span>
-                <div>${data.texto}</div>
-              </div>`;
-          });
-          chat.scrollTop = chat.scrollHeight;
-        });
     }
 
-    function sendMessage() {
-      // Verifica se o usuário está autenticado
-      if (!currentUser || !currentUser.displayName) {
-        console.error("Usuário não autenticado ou sem nome de exibição");
-        return;
-      }
+    // Login bem-sucedido
+    btnAuth.textContent = btnOriginalText;
+    btnAuth.classList.remove("loading");
+    btnAuth.disabled = false;
 
-      const texto = document.getElementById("message").value.trim();
-      if (!texto) return;
+  } catch (error) {
+    console.error("Erro na autenticação:", error);
+    errorElement.textContent = tratarErroAutenticacao(error);
+    btnAuth.textContent = btnOriginalText;
+    btnAuth.classList.remove("loading");
+    btnAuth.disabled = false;
+  }
+}
 
-      // Desabilita o botão durante o envio
-      const sendBtn = document.getElementById("send-btn");
-      sendBtn.disabled = true;
-      sendBtn.textContent = "Enviando...";
-
-      db.collection("mensagens").add({
-        nome: currentUser.displayName,
-        photo: currentUser.photoURL || "https://i.imgur.com/2WZtOD5.png",
-        texto: texto,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .then(() => {
-        document.getElementById("message").value = "";
-      })
-      .catch(error => {
-        console.error("Erro ao enviar mensagem:", error);
-      })
-      .finally(() => {
-        sendBtn.disabled = false;
-        sendBtn.textContent = "Enviar";
-      });
-    }
-
-    document.getElementById("message").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        sendMessage();
-      }
+// Funções auxiliares
+async function processarUsuario(user, nome, foto) {
+  // Atualiza perfil se necessário
+  if (!user.displayName || user.displayName !== nome || (foto && user.photoURL !== foto)) {
+    await user.updateProfile({
+      displayName: nome,
+      photoURL: foto || "https://i.imgur.com/2WZtOD5.png"
     });
-
-
-
-
-
-
-    //slaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-  /*  async function resetChat() {
-  if (!currentUser) {
-    alert("Você precisa estar logado para resetar o chat!");
-    return;
+    await user.reload();
   }
 
-  if (!confirm("Tem certeza que deseja apagar TODAS as mensagens do chat?\nEsta ação não pode ser desfeita!")) {
+  // Verifica status de admin
+  const userDoc = await db.collection("usuarios").doc(user.uid).get();
+  isAdmin = userDoc.exists && userDoc.data().isAdmin === true;
+}
+
+async function cadastrarUsuario(nome, email, senha, foto) {
+  if (senha.length < 6) {
+    throw new Error("A senha precisa ter 6 ou mais caracteres.");
+  }
+
+  // Verifica se nome de usuário já existe
+  const query = await db.collection("usuarios").where("username", "==", nome).get();
+  if (!query.empty) {
+    throw new Error("Esse nome de usuário já está em uso.");
+  }
+
+  // Cria novo usuário
+  const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
+  
+  // Atualiza perfil e cria registro
+  await Promise.all([
+    userCredential.user.updateProfile({
+      displayName: nome,
+      photoURL: foto || "https://i.imgur.com/2WZtOD5.png"
+    }),
+    db.collection("usuarios").doc(userCredential.user.uid).set({
+      username: nome,
+      email: email,
+      isAdmin: false,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+  ]);
+
+  await userCredential.user.reload();
+}
+
+function tratarErroAutenticacao(error) {
+  const erros = {
+    "auth/wrong-password": "Senha incorreta!",
+    "auth/invalid-email": "Formato de e-mail inválido!",
+    "auth/email-already-in-use": "Este e-mail já está em uso.",
+    "auth/weak-password": "Senha muito fraca (mínimo 6 caracteres)",
+    "auth/too-many-requests": "Muitas tentativas. Tente mais tarde.",
+    "auth/operation-not-allowed": "Operação não permitida."
+  };
+
+  return erros[error.code] || error.message || "Erro desconhecido na autenticação";
+}
+
+// Monitor de autenticação
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+    
+    try {
+      const userDoc = await db.collection("usuarios").doc(user.uid).get();
+      isAdmin = userDoc.exists && userDoc.data().isAdmin === true;
+      
+      document.getElementById("admin-controls").style.display = isAdmin ? "block" : "none";
+      document.getElementById("auth-area").style.display = "none";
+      document.getElementById("chat-container").style.display = "flex";
+      
+      startChat();
+    } catch (error) {
+      console.error("Erro ao verificar admin:", error);
+      auth.signOut();
+    }
+  } else {
+    if (chatListener) {
+      chatListener(); // Remove o listener do chat
+      chatListener = null;
+    }
+    
+    currentUser = null;
+    isAdmin = false;
+    document.getElementById("auth-area").style.display = "flex";
+    document.getElementById("chat-container").style.display = "none";
+    document.getElementById("admin-controls").style.display = "none";
+  }
+});
+
+// Funções do chat
+function startChat() {
+  chatListener = db.collection("mensagens")
+    .orderBy("timestamp")
+    .onSnapshot((snapshot) => {
+      const chat = document.getElementById("chat-box");
+      chat.innerHTML = "";
+      
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const date = data.timestamp?.toDate() || new Date();
+        const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        chat.innerHTML += `
+          <div class="msg ${data.isAdmin ? 'admin' : ''}">
+            <img src="${data.photo || 'https://i.imgur.com/2WZtOD5.png'}" />
+            <strong>${data.nome}</strong>
+            <span class="timestamp">${timeString}</span>
+            <div>${data.texto}</div>
+          </div>`;
+      });
+      
+      chat.scrollTop = chat.scrollHeight;
+    });
+}
+
+async function sendMessage() {
+  if (!currentUser) return;
+
+  const input = document.getElementById("message");
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  const btn = document.getElementById("send-btn");
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = "Enviando...";
+
+  try {
+    await db.collection("mensagens").add({
+      nome: currentUser.displayName,
+      photo: currentUser.photoURL || "https://i.imgur.com/2WZtOD5.png",
+      texto: texto,
+      isAdmin: isAdmin,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    input.value = "";
+  } catch (error) {
+    console.error("Erro ao enviar mensagem:", error);
+    alert("Erro ao enviar: " + error.message);
+  } finally {
+    btn.textContent = originalText;
+    btn.disabled = false;
+  }
+}
+
+// Função de reset para admin
+async function resetChat() {
+  if (!isAdmin) return;
+
+  if (!confirm("Tem certeza que deseja apagar TODAS as mensagens?\nEsta ação não pode ser desfeita!")) {
     return;
   }
 
   const btn = document.getElementById("reset-btn");
-  const originalText = btn.textContent;
   btn.disabled = true;
+  const originalText = btn.textContent;
   btn.textContent = "Apagando...";
 
   try {
-    // Primeiro obtemos todas as mensagens
-    const querySnapshot = await db.collection("mensagens").get();
-    
-    // Se não houver mensagens
-    if (querySnapshot.empty) {
-      alert("O chat já está vazio!");
-      return;
-    }
-
-    // Cria um batch para deletar todas de uma vez
+    const snapshot = await db.collection("mensagens").get();
     const batch = db.batch();
-    querySnapshot.forEach(doc => {
+    
+    snapshot.forEach(doc => {
       batch.delete(doc.ref);
     });
 
     await batch.commit();
-    console.log("Chat resetado com sucesso!");
   } catch (error) {
     console.error("Erro ao resetar chat:", error);
-    alert("Erro ao resetar o chat: " + error.message);
+    alert("Erro ao resetar: " + error.message);
   } finally {
-    btn.disabled = false;
     btn.textContent = originalText;
+    btn.disabled = false;
   }
-}*/
+}
+
+// Event listeners
+document.getElementById("message").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
+});
   </script>
 </body>
 </html>
