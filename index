@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONFIDENCIAL</title>
+    <style>
+        body {
+            background: #000;
+            color: #40ff00;
+            font-family: monospace;
+            text-align: center;
+            padding: 2rem;
+            margin: 0;
+        }
+        input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #40ff00;
+            color: inherit;
+            font: inherit;
+            margin: 1rem 0;
+            outline: none;
+            width: 80%;
+        }
+        button {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font: inherit;
+            margin: 1rem 0;
+        }
+        #mensagem {
+            min-height: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h2>Arquivo confidencial R3N4N</h2>
+    <input type="password" id="passInput" autocomplete="off" placeholder="Digite a senha...">
+    <button onclick="check()">Verificação</button>
+    <p id="mensagem"></p>
+
+    <script>
+        function check() {
+            const pass = document.getElementById('passInput').value;
+            const mensagem = document.getElementById('mensagem');
+            
+            if (pass === "Missao_D") {
+                mensagem.textContent = "Pode entrar, cara.";
+                mensagem.style.color = "#40ff00";
+                setTimeout(() => window.location = "missao.html", 800);
+            } else {
+                mensagem.textContent = "Saia daqui";
+                mensagem.style.color = "#ff0000";
+            }
+        }
+    </script>
+</body>
+</html>

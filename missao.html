@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 11 Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0078d7;
+            font-family: 'Segoe UI', sans-serif;
+            user-select: none;
+            overflow: hidden;
+        }
+        .desktop {
+            height: 100vh;
+            background-image: url('https://wallpapercave.com/wp/wp9414530.jpg');
+            background-size: cover;
+            position: relative;
+        }
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 48px;
+            background-color: rgba(32, 32, 32, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 0 20px;
+        }
+        .start-btn {
+            width: 40px;
+            height: 40px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Windows_logo_-_2021.svg/1024px-Windows_logo_-_2021.svg.png');
+            background-size: 60%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .search-btn, .task-view, .widgets-btn {
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        .time {
+            color: white;
+            font-size: 12px;
+            position: absolute;
+            right: 20px;
+        }
+        .window {
+            position: absolute;
+            width: 600px;
+            height: 400px;
+            background-color: white;
+            border-radius: 8px;
+            top: 100px;
+            left: 100px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .title-bar {
+            height: 32px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+        }
+        .title {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 12px;
+        }
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .close { background-color: #ff5f56; }
+        .minimize { background-color: #ffbd2e; }
+        .maximize { background-color: #27c93f; }
+        .content {
+            padding: 20px;
+            text-align: center;
+            color: #333;
+        }
+        .icon {
+            display: inline-block;
+            width: 80px;
+            margin: 20px;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            text-shadow: 1px 1px 2px black;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <!-- Desktop Icons -->
+        <div class="icon" style="position: absolute; top: 20px; left: 20px;">
+            <div style="width:40px;height:40px;margin:0 auto;background-color:#0078d7;border-radius:5px;"></div>
+            <div>Recycle Bin</div>
+        </div>
+        
+        <!-- Fake Window -->
+        <div class="window">
+            <div class="title-bar">
+                <div class="window-controls">
+                    <div class="control-btn close"></div>
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                </div>
+                <div class="title">Microsoft Edge</div>
+            </div>
+            <div class="content">
+                <h2>This Window Doesn't Work</h2>
+                <p>It's just for show 😉</p>
+                <button onclick="voltarimediato()">VOLTAR AGORA</button>
+            </div>
+        </div>
+        
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <div class="start-btn"></div>
+            <div class="search-btn"></div>
+            <div class="task-view"></div>
+            <div class="widgets-btn"></div>
+            <div class="time">3:14 PM</div>
+        </div>
+    </div>
+    
+    <script>
+        // Make window draggable (but fake)
+        const windowElement = document.querySelector('.window');
+        let isDragging = false;
+        let offsetX, offsetY;
+        
+        windowElement.querySelector('.title-bar').addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - windowElement.getBoundingClientRect().left;
+            offsetY = e.clientY - windowElement.getBoundingClientRect().top;
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            windowElement.style.left = (e.clientX - offsetX) + 'px';
+            windowElement.style.top = (e.clientY - offsetY) + 'px';
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        // Fake close button
+        document.querySelector('.close').addEventListener('click', () => {
+            alert("This button doesn't actually work!");
+        });
+        function voltarimediato(){
+            window.location = "index.html";
+        }
+    </script>
+</body>
+</html>

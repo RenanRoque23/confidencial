@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONFIDENCIAL</title>
+    <link rel="icon" href="logo.png">
+    <style>
+        body {
+            background: #000000;
+            color: #40ff00;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            font-family: monospace;
+        }
+        div {
+            border-radius: 25px;
+            background-color: #061a00;
+            width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            box-shadow: 0 0 15px #061a00;
+        }
+        input {
+            background: #000;
+            color: #40ff00;
+            border: none;
+            border-bottom: 1px solid #40ff00;
+            padding: 8px;
+            margin: 10px 0;
+            width: 80%;
+            outline: none;
+        }
+        button {
+            background: transparent;
+            color: #40ff00;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .toggle-password {
+            background: transparent;
+        }
+        #mensagem {
+            margin-top: 15px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Arquivo confidencial R3N4N</h2>
+        <input type="password" id="passInput" autocomplete="off" placeholder="Digite a senha...">
+        <button class="toggle-password" onclick="togglePassword()">👁️</button>
+        <br>
+        <button onclick="check()">Verificação</button>
+        <p id="mensagem"></p>
+    </div>
+
+    <script>
+        function check() {
+            const password = document.getElementById('passInput').value;
+            const mensagem = document.getElementById('mensagem');
+    
+            if (password == "Missao_D") {
+                mensagem.innerHTML = "Pode entrar, cara.";
+                mensagem.style.color = "#40ff00";
+                setTimeout(() => {
+                    window.location = "missao.html";
+                }, 1500);
+            } else {
+                mensagem.innerHTML = "Saia daqui";
+                mensagem.style.color = "#ff0000";
+            }
+        }
+        
+        function togglePassword() {
+            const passInput = document.getElementById('passInput');
+            passInput.type = passInput.type === "password" ? "text" : "password";
+        }
+    </script>
+</body>
+</html>
